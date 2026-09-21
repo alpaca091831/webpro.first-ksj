@@ -41,6 +41,7 @@ button[aria-pressed="true"] {
     background: #40566b;
     color: white;
 }
+
 /* 장소 설명을 담는 공통 상자입니다. */
 .place-panel,
 .map-panel {
@@ -49,6 +50,7 @@ button[aria-pressed="true"] {
     border-radius: 1rem;
     background: white;
 }
+
 .place-panel img {
     display: block;
     width: min(100%, 480px);
@@ -80,6 +82,10 @@ a {
   /* 모바일에서는 버튼을 세로로 배치해 누르기 쉽게 합니다. */
     #buttons {
         flex-direction: column;
+    }
+  /* 모바일에서는 설명과 지도를 위아래로 읽습니다. */
+    main {
+        display: block;
     }
     .page {
         width: calc(100% - 1.5rem);
