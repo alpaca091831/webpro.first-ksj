@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>나의 캠퍼스 발자취</title>
+        <link rel="stylesheet" href="styles.css">
+        <script src="app.js" defer></script>
+    </head>
+
+    <body>
+    <div class="page">
+        <header>
+            <h1>나의 캠퍼스 발자취</h1>
+            <p>버튼을 눌러 내가 자주 가는 장소를 둘러보세요.</p>
+        </header>
+        <!-- app.js가 이 안에 장소 버튼 세 개를 만듭니다. -->
+        <nav id="buttons" aria-label="장소 선택"></nav>
+        <main>
+            <!-- 장소 내용은 HTML에 모두 작성하고, 처음에는 첫 장소만 보여 줍니다. -->
+            <section id="gym" class="place-panel place-gym">
+                <h2>건강을 책임지는 헬스장</h2>
+                <img
+                    src="../images/trust_gym.jpg"
+                    alt="트러스트짐 내부에서 사람들이 운동하고 있는 모습"
+                >
+                <p>건강을 위해 찾는 장소</p>
+                <p>일주일에 제일 많이 가는 장소 중 하나</p>
+                <p>육체적인 건강뿐만 아니라 스트레스 해소를 하기에도 좋습니다.</p>
+                <h3>찾아가는 방법</h3>
+                <p>김수환관 1층에 위치해 있으며 카페멘사를 지나 체육관 입구 왼쪽에 위치하고 있습니다.</p>
+                <h3>헬스장 정보</h3>
+                <p>평일 - 07:00 ~ 22:30<br>토요일 - 09:30 ~ 18:00</p>
+            </section>
+            <section id="road" class="place-panel place-road" hidden>
+                <h2>좋아하는 길</h2>
+                <img src="../images/road.jpg" alt="비르투스 뒤쪽 계단길">
+                <p>사람이 많이 다니지 않아 편한 길</p>
+                <h3>안정감을 느끼는 길</h3>
+                <p>양 옆이 벽과 건물로 막혀있고 사람이 많이 다니지 않아 편합니다.</p>
+                <h3>찾아가는 방법</h3>
+                <p>신데렐라계단을 올라와서 쭉 가다가 오른쪽에 비르투스관 뒤쪽에 위치해 있습니다.</p>
+                <h3>여기에서 해볼 것</h3>
+                <p>길에 진입하기 전 광장에서부터 천천히 걸어와보기</p>
+                <p>돌계단이 깨진 곳이 있어 오를 때 조심하기</p>
+            </section>
+            <section id="store" class="place-panel place-store" hidden>
+                <h2>자주가는 가게 꼬밥</h2>
+                <img src="../images/store.jpg" alt="자주 먹는 메뉴인 제육덮밥">
+                <p>끼니를 챙기러 자주 가는 음식점</p>
+                <h3>자주 가기도 하고 살갑게 대해주심</h3>
+                <p>끼니를 챙기로 자주 방문해 아주머니랑 수다를 떱니다.</p>
+                <h3>찾아가는 방법</h3>
+                <p>캠퍼스를 정문으로 나가서 길을 건넌 뒤 왼쪽으로 쭉 가다보면 교회 전에 위치해 있습니다.</p>
+                <h3>자주 먹는 메뉴</h3>
+                <p>제육덮밥<br>삼겹살 덮밥</p>
+            </section>
+            <section class="map-panel">
+                <h2 id="map-title">선택한 장소의 지도</h2>
+                <iframe id="map" title="선택한 장소의 Google 지도"></iframe>
+                <p>
+                    <a id="map-link" href="#" target="_blank" rel="noopener">
+                    지도 새 창에서 열기
+                    </a>
+                </p>
+            </section>
+        </main>
+
+        <footer>
+            <p>장소를 선택하면 설명과 지도가 함께 바뀝니다.</p>
+        </footer>
+    </div>
+    </body>
+</html>
