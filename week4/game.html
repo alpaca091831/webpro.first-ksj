@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>캠퍼스 사진 에임 게임</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="game.js" defer></script>
+  </head>
+  <body>
+    <div class="page game-page">
+      <header>
+        <p><a href="index.html">장소 탐험 페이지로 돌아가기</a></p>
+        <h1>캠퍼스 사진 에임 게임</h1>
+        <p>60초 동안 나타나는 사진 원을 빠르게 클릭해 보세요.</p>
+      </header>
+      <main>
+        <section class="game-panel">
+          <div class="game-info" aria-live="polite">
+            <strong>점수 <span id="score">0</span></strong>
+            <span>남은 시간 <span id="time">60</span>초</span>
+            <span>등장 예정 <span id="target-count">0</span>개</span>
+          </div>
+          <button id="start-button" type="button">게임 시작</button>
+          <p id="game-status">시작 버튼을 누르면 게임이 시작됩니다.</p>
+          <canvas id="game" width="860" height="520" aria-label="사진 원을 클릭하는 게임"></canvas>
+        </section>
+      </main>
+      <footer>
+        <p>사용 사진: 헬스장, 좋아하는 길, 자주 가는 가게</p>
+        <p><a href="statistics.html">생활체육 참여율 통계 보기</a></p>
+      </footer>
+    </div>
+  </body>
+</html>
