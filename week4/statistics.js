@@ -122,12 +122,15 @@ function showChart(chartName) {
 }
 async function start() {
   try {
+    if (window.location.protocol === "file:") {
+      throw new Error("HTML을 파일로 직접 열 수 없습니다. Live Server나 GitHub Pages에서 열어 주세요.");
+    }
     const response = await fetch(csvPath);
     if (!response.ok) {
       throw new Error(`CSV 요청 실패 (${response.status})`);
     }
     const rows = parseCsv(await response.text());
-    years = Object.keys(rows[0]).filter((field) => /^\d{4}$/.test(field));
+    years = Object.keys(rows[0]).filter((field) => /^\d{4}$/.test(field) && Number(field) >= 2022);
     ageRows.push(...readAgeRows(rows));
     if (years.length === 0) {
       throw new Error("연도 열을 찾지 못했습니다.");
