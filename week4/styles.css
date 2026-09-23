@@ -1,97 +1,138 @@
 /* 모든 요소의 크기를 계산하기 쉽게 설정합니다. */
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 /* 페이지 전체의 기본 글꼴과 색상을 정합니다. */
 body {
-    margin: 0;
-    color: #263238;
-    background: #eef2f5;
-    font-family: "Malgun Gothic", sans-serif;
-    line-height: 1.7;
+  margin: 0;
+  color: #263238;
+  background: #eef2f5;
+  font-family: "Malgun Gothic", sans-serif;
+  line-height: 1.7;
 }
 /* 전체 내용을 가운데에 놓는 상자입니다. */
 .page {
-    width: calc(100% - 2rem);
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 2rem 0;
+  width: calc(100% - 2rem);
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 0;
 }
 header,
 footer {
-    text-align: center;
+  text-align: center;
 }
 /* 장소 버튼을 정렬합니다. */
 #buttons {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 button {
-    padding: 0.7rem 1rem;
-    border: 1px solid #40566b;
-    border-radius: 0.5rem;
-    background: white;
-    color: #40566b;
-    cursor: pointer;
-    font: inherit;
+  padding: 0.7rem 1rem;
+  border: 1px solid #40566b;
+  border-radius: 0.5rem;
+  background: white;
+  color: #40566b;
+  cursor: pointer;
+  font: inherit;
 }
 /* 선택된 버튼을 다른 색으로 표시합니다. */
 button[aria-pressed="true"] {
-    background: #40566b;
-    color: white;
+  background: #40566b;
+  color: white;
 }
-
 /* 장소 설명을 담는 공통 상자입니다. */
 .place-panel,
 .map-panel {
-    margin-bottom: 1rem;
-    padding: 1.5rem;
-    border-radius: 1rem;
-    background: white;
+  margin-bottom: 1rem;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: white;
 }
 .place-panel img {
-    display: block;
-    width: min(100%, 480px);
-    height: auto;
-    margin: 0 auto 1rem;
-    border-radius: 0.75rem;
+  display: block;
+  width: min(100%, 480px);
+  height: auto;
+  margin: 0 auto 1rem;
+  border-radius: 0.75rem;
 }
 .place-gym {
-    border: 5px solid #ed6a2c;
+  border: 5px solid #ed6a2c;
 }
 .place-road {
-    border: 2px dashed #5f9565;
-    background: #f9fff7;
+  border: 2px dashed #5f9565;
+  background: #f9fff7;
 }
 .place-store {
-    border: 2px solid #d88945;
-    background: #fffaf4;
-    font-family: Georgia, "Batang", serif;
+  border: 2px solid #d88945;
+  background: #fffaf4;
+  font-family: Georgia, "Batang", serif;
 }
 iframe {
-    width: 100%;
-    height: 320px;
-    border: 0;
+  width: 100%;
+  height: 320px;
+  border: 0;
 }
 a {
-    color: #1769aa;
+  color: #1769aa;
 }
 @media (max-width: 600px) {
   /* 모바일에서는 버튼을 세로로 배치해 누르기 쉽게 합니다. */
-    #buttons {
-        flex-direction: column;
-    }
-  /* 모바일에서는 설명과 지도를 위아래로 읽습니다. */
-    main {
-        display: block;
-    }
-    .page {
-        width: calc(100% - 1.5rem);
-        padding: 1rem 0;
-    }
-    .place-panel,
-    .map-panel {
-        padding: 1rem;
-    }
+  #buttons {
+    flex-direction: column;
+  }
+  .page {
+    width: calc(100% - 1.5rem);
+    padding: 1rem 0;
+  }
+  .place-panel,
+  .map-panel {
+    padding: 1rem;
+  }
+}
+/* 통계 페이지의 탭과 그래프를 꾸밉니다. */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1.5rem 0 1rem;
+}
+.tabs button {
+  width: auto;
+}
+button[aria-selected="true"] {
+  background: #40566b;
+  color: white;
+}
+.status,
+.chart-panel,
+.notice {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: white;
+}
+.status {
+  margin: 0 0 1rem;
+}
+.chart-panel {
+  margin-bottom: 1rem;
+}
+.meta {
+  color: #52636d;
+  font-size: 0.95rem;
+}
+.chart-box {
+  position: relative;
+  width: 100%;
+  height: 430px;
+}
+.notice {
+  background: #fffaf0;
+}
+@media (max-width: 600px) {
+  .tabs {
+    flex-direction: column;
+  }
+  .chart-box {
+    height: 360px;
+  }
 }
