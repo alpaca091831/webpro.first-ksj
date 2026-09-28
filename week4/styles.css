@@ -174,13 +174,21 @@ button[aria-selected="true"] {
   color: #365568;
 }
 
-#start-button {
+.game-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+#start-button,
+#restart-button {
   border-color: #527b5c;
   color: #365568;
   background: #edf5df;
 }
 
-#start-button:hover {
+#start-button:hover,
+#restart-button:hover:not(:disabled) {
   background: #dcebd8;
 }
 
