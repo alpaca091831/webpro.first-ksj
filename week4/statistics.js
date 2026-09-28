@@ -1,63 +1,26 @@
-const csvPath = "data/sports.csv";
-const ageRows = [];
+const csvPath = "./data/sports.csv";
 let years = [];
 const ageLabels = ["10대", "20대", "30대", "40대", "50대", "60대", "70세 이상"];
 const chartColors = ["#e76f51", "#f4a261", "#e9c46a", "#2a9d8f", "#457b9d", "#6a4c93", "#264653"];
 const yearColors = ["#457b9d", "#2a9d8f", "#e9c46a", "#e76f51", "#6a4c93", "#264653"];
-let trendChart;
-let comparisonChart;
+const charts = {
+  trend: null,
+  comparison: null
+};
+
 const statusMessage = document.querySelector("#status");
 const panels = {
   trend: document.querySelector("#trend-panel"),
   comparison: document.querySelector("#comparison-panel")
 };
+const buttons = document.querySelectorAll("[data-chart]");
+
 function makeNumber(value) {
-  const number = Number(String(value).replace(/,/g, "").trim());
+  const number = Number(String(value).trim());
   return Number.isFinite(number) ? number : null;
 }
-function readAgeRows(results) {
-  return results.filter((row) => {
-    return row["통계분류(1)"] === "연령별" && ageLabels.includes(row["통계분류(2)"]);
-  });
-}
-function parseCsv(text) {
-  const rows = [];
-  let row = [];
-  let value = "";
-  let quoted = false;
-  for (let index = 0; index < text.length; index += 1) {
-    const character = text[index];
-    const nextCharacter = text[index + 1];
-    if (character === '"' && quoted && nextCharacter === '"') {
-      value += '"';
-      index += 1;
-    } else if (character === '"') {
-      quoted = !quoted;
-    } else if (character === "," && !quoted) {
-      row.push(value);
-      value = "";
-    } else if ((character === "\n" || character === "\r") && !quoted) {
-      if (character === "\r" && nextCharacter === "\n") {
-        index += 1;
-      }
-      row.push(value);
-      rows.push(row);
-      row = [];
-      value = "";
-    } else {
-      value += character;
-    }
-  }
-  if (value || row.length > 0) {
-    row.push(value);
-    rows.push(row);
-  }
-  const headers = rows.shift().map((header) => header.replace(/^\uFEFF/, ""));
-  return rows
-    .filter((values) => values.length === headers.length)
-    .map((values) => Object.fromEntries(headers.map((header, index) => [header, values[index]])));
-}
-function createTrendChart() {
+
+function drawCharts(ageRows) {
   const datasets = ageRows.map((row, index) => ({
     label: row["통계분류(2)"],
     data: years.map((year) => makeNumber(row[year])),
@@ -66,7 +29,8 @@ function createTrendChart() {
     tension: 0.2,
     spanGaps: false
   }));
-  trendChart = new Chart(document.querySelector("#trend-chart"), {
+
+  charts.trend = new Chart(document.querySelector("#trend-chart"), {
     type: "bar",
     data: { labels: years, datasets },
     options: {
@@ -85,16 +49,16 @@ function createTrendChart() {
       }
     }
   });
-}
-function createComparisonChart() {
-  const datasets = years.map((year, yearIndex) => ({
+
+  const comparisonDatasets = years.map((year, yearIndex) => ({
     label: year,
     data: ageRows.map((row) => makeNumber(row[year])),
     backgroundColor: yearColors[yearIndex % yearColors.length]
   }));
-  comparisonChart = new Chart(document.querySelector("#comparison-chart"), {
+
+  charts.comparison = new Chart(document.querySelector("#comparison-chart"), {
     type: "bar",
-    data: { labels: ageLabels, datasets },
+    data: { labels: ageLabels, datasets: comparisonDatasets },
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -112,40 +76,91 @@ function createComparisonChart() {
     }
   });
 }
-function showChart(chartName) {
+
+function showPanel(id) {
   Object.entries(panels).forEach(([name, panel]) => {
-    panel.hidden = name !== chartName;
+    panel.hidden = panel.id !== `${id}-panel`;
   });
-  document.querySelectorAll("[data-chart]").forEach((button) => {
-    button.setAttribute("aria-selected", String(button.dataset.chart === chartName));
-  });
-}
-async function start() {
-  try {
-    if (window.location.protocol === "file:") {
-      throw new Error("HTML을 파일로 직접 열 수 없습니다. Live Server나 GitHub Pages에서 열어 주세요.");
-    }
-    const response = await fetch(csvPath);
-    if (!response.ok) {
-      throw new Error(`CSV 요청 실패 (${response.status})`);
-    }
-    const rows = parseCsv(await response.text());
-    years = Object.keys(rows[0]).filter((field) => /^\d{4}$/.test(field) && Number(field) >= 2022);
-    ageRows.push(...readAgeRows(rows));
-    if (years.length === 0) {
-      throw new Error("연도 열을 찾지 못했습니다.");
-    }
-    if (ageRows.length !== ageLabels.length) {
-      throw new Error("예상한 연령별 행을 모두 찾지 못했습니다.");
-    }
-    createTrendChart();
-    createComparisonChart();
-    statusMessage.textContent = "CSV를 읽었습니다. 탭을 눌러 두 그래프를 비교해 보세요.";
-  } catch (error) {
-    statusMessage.textContent = `통계 자료를 읽지 못했습니다: ${error.message}`;
+
+  for (const button of buttons) {
+    button.setAttribute("aria-selected", String(button.dataset.chart === id));
   }
+
+  requestAnimationFrame(function () {
+    if (charts[id]) {
+      charts[id].resize();
+    }
+  });
 }
-document.querySelectorAll("[data-chart]").forEach((button) => {
-  button.addEventListener("click", () => showChart(button.dataset.chart));
-});
-start();
+
+function loadCsv() {
+  if (window.location.protocol === "file:") {
+    statusMessage.textContent = "CSV를 읽으려면 Live Server나 GitHub Pages에서 페이지를 여세요.";
+    return;
+  }
+
+  if (typeof Papa === "undefined") {
+    statusMessage.textContent = "Papa Parse를 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침하세요.";
+    return;
+  }
+
+  if (typeof Chart === "undefined") {
+    statusMessage.textContent = "Chart.js를 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침하세요.";
+    return;
+  }
+
+  Papa.parse(csvPath, {
+    download: true,
+    header: true,
+    skipEmptyLines: "greedy",
+    complete: function (results) {
+      const fields = results.meta.fields || [];
+      const required = ["통계분류(1)", "통계분류(2)"];
+      years = fields.filter((field) => /^\d{4}$/.test(field) && Number(field) >= 2022);
+
+      if (
+        results.errors.length > 0 ||
+        !required.every((name) => fields.includes(name)) ||
+        years.length === 0
+      ) {
+        statusMessage.textContent = "CSV 형식과 열 이름을 확인하세요.";
+        return;
+      }
+
+      const ageRows = results.data.filter(function (row) {
+        const isExpectedAge = row["통계분류(1)"].trim() === "연령별"
+          && ageLabels.includes(row["통계분류(2)"].trim());
+        const hasAllNumbers = years.every(function (year) {
+          return row[year].trim() !== "" && makeNumber(row[year]) !== null;
+        });
+        return isExpectedAge && hasAllNumbers;
+      });
+
+      const hasAllAgeGroups = ageLabels.every(function (label) {
+        return ageRows.some((row) => row["통계분류(2)"].trim() === label);
+      });
+
+      if (!hasAllAgeGroups) {
+        statusMessage.textContent = "연령별 데이터가 일부 없거나 숫자 형식이 잘못되었습니다. CSV를 확인하세요.";
+        return;
+      }
+
+      drawCharts(ageRows);
+      showPanel("trend");
+      statusMessage.textContent =
+        "연령별 " + ageRows.length + "개 집단 표시 / 다른 분류 등 "
+        + (results.data.length - ageRows.length) + "행 제외";
+    },
+    error: function () {
+      statusMessage.textContent = "CSV 경로와 네트워크를 확인하세요.";
+    }
+  });
+}
+
+for (const button of buttons) {
+  button.addEventListener("click", function () {
+    showPanel(button.dataset.chart);
+  });
+}
+
+loadCsv();
