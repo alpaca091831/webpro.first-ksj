@@ -90,20 +90,6 @@ a {
   color: #1769aa;
 }
 
-.week4-link-button {
-  display: inline-block;
-  padding: 0.65rem 1rem;
-  border-radius: 0.5rem;
-  background: #527b5c;
-  color: white;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.week4-link-button:hover {
-  background: #365568;
-}
-
 @media (max-width: 600px) {
   /* 모바일에서는 버튼을 세로로 배치해 누르기 쉽게 합니다. */
   #buttons {
