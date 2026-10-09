@@ -1,17 +1,22 @@
-const csvPath = "./data/sports.csv";
+const sportsCsvPath = "./data/sports.csv";
+const facilitiesCsvPath = "./data/facilitys.csv";
 let years = [];
 const ageLabels = ["10대", "20대", "30대", "40대", "50대", "60대", "70세 이상"];
 const chartColors = ["#e76f51", "#f4a261", "#e9c46a", "#2a9d8f", "#457b9d", "#6a4c93", "#264653"];
-const yearColors = ["#457b9d", "#2a9d8f", "#e9c46a", "#e76f51", "#6a4c93", "#264653"];
+const facilityLabels = ["성당", "교회", "불교", "기타"];
 const charts = {
-  trend: null,
-  comparison: null
+  sports: null,
+  facilities: null
+};
+const loadStatus = {
+  sports: "불러오는 중",
+  facilities: "불러오는 중"
 };
 
 const statusMessage = document.querySelector("#status");
 const panels = {
-  trend: document.querySelector("#trend-panel"),
-  comparison: document.querySelector("#comparison-panel")
+  sports: document.querySelector("#sports-panel"),
+  facilities: document.querySelector("#facilities-panel")
 };
 const buttons = document.querySelectorAll("[data-chart]");
 
@@ -20,7 +25,12 @@ function makeNumber(value) {
   return Number.isFinite(number) ? number : null;
 }
 
-function drawCharts(ageRows) {
+function updateStatus() {
+  statusMessage.textContent =
+    "생활체육: " + loadStatus.sports + " · 종교시설: " + loadStatus.facilities;
+}
+
+function drawSportsChart(ageRows) {
   const datasets = ageRows.map((row, index) => ({
     label: row["통계분류(2)"],
     data: years.map((year) => makeNumber(row[year])),
@@ -30,7 +40,7 @@ function drawCharts(ageRows) {
     spanGaps: false
   }));
 
-  charts.trend = new Chart(document.querySelector("#trend-chart"), {
+  charts.sports = new Chart(document.querySelector("#sports-chart"), {
     type: "bar",
     data: { labels: years, datasets },
     options: {
@@ -49,29 +59,25 @@ function drawCharts(ageRows) {
       }
     }
   });
+}
 
-  const comparisonDatasets = years.map((year, yearIndex) => ({
-    label: year,
-    data: ageRows.map((row) => makeNumber(row[year])),
-    backgroundColor: yearColors[yearIndex % yearColors.length]
-  }));
-
-  charts.comparison = new Chart(document.querySelector("#comparison-chart"), {
-    type: "bar",
-    data: { labels: ageLabels, datasets: comparisonDatasets },
+function drawFacilitiesChart(counts) {
+  charts.facilities = new Chart(document.querySelector("#facilities-chart"), {
+    type: "doughnut",
+    data: {
+      labels: facilityLabels,
+      datasets: [{
+        label: "시설 수",
+        data: facilityLabels.map((label) => counts[label]),
+        backgroundColor: ["#7b5ea7", "#c76d45", "#557c55", "#8a9299"]
+      }]
+    },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      scales: {
-        x: { title: { display: true, text: "연령대" } },
-        y: {
-          beginAtZero: true,
-          title: { display: true, text: "참여율 (원자료 단위 확인 필요)" }
-        }
-      },
       plugins: {
         legend: { position: "bottom" },
-        tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${context.raw}` } }
+        tooltip: { callbacks: { label: (context) => `${context.label}: ${context.raw}곳` } }
       }
     }
   });
@@ -93,23 +99,26 @@ function showPanel(id) {
   });
 }
 
-function loadCsv() {
+function loadSportsCsv() {
   if (window.location.protocol === "file:") {
-    statusMessage.textContent = "CSV를 읽으려면 Live Server나 GitHub Pages에서 페이지를 여세요.";
+    loadStatus.sports = "페이지를 Live Server나 GitHub Pages에서 여세요";
+    updateStatus();
     return;
   }
 
   if (typeof Papa === "undefined") {
-    statusMessage.textContent = "Papa Parse를 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침하세요.";
+    loadStatus.sports = "Papa Parse를 불러오지 못했습니다";
+    updateStatus();
     return;
   }
 
   if (typeof Chart === "undefined") {
-    statusMessage.textContent = "Chart.js를 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침하세요.";
+    loadStatus.sports = "Chart.js를 불러오지 못했습니다";
+    updateStatus();
     return;
   }
 
-  Papa.parse(csvPath, {
+  Papa.parse(sportsCsvPath, {
     download: true,
     header: true,
     skipEmptyLines: "greedy",
@@ -123,7 +132,8 @@ function loadCsv() {
         !required.every((name) => fields.includes(name)) ||
         years.length === 0
       ) {
-        statusMessage.textContent = "CSV 형식과 열 이름을 확인하세요.";
+        loadStatus.sports = "CSV 형식이나 열 이름을 확인하세요";
+        updateStatus();
         return;
       }
 
@@ -141,18 +151,71 @@ function loadCsv() {
       });
 
       if (!hasAllAgeGroups) {
-        statusMessage.textContent = "연령별 데이터가 일부 없거나 숫자 형식이 잘못되었습니다. CSV를 확인하세요.";
+        loadStatus.sports = "연령별 데이터 또는 숫자 형식을 확인하세요";
+        updateStatus();
         return;
       }
 
-      drawCharts(ageRows);
-      showPanel("trend");
-      statusMessage.textContent =
-        "연령별 " + ageRows.length + "개 집단 표시 / 다른 분류 등 "
-        + (results.data.length - ageRows.length) + "행 제외";
+      drawSportsChart(ageRows);
+      loadStatus.sports = ageRows.length + "개 연령 집단 표시";
+      updateStatus();
     },
     error: function () {
-      statusMessage.textContent = "CSV 경로와 네트워크를 확인하세요.";
+      loadStatus.sports = "CSV 경로와 네트워크를 확인하세요";
+      updateStatus();
+    }
+  });
+}
+
+function loadFacilitiesCsv() {
+  if (window.location.protocol === "file:") {
+    loadStatus.facilities = "페이지를 Live Server나 GitHub Pages에서 여세요";
+    updateStatus();
+    return;
+  }
+
+  if (typeof Papa === "undefined" || typeof Chart === "undefined") {
+    loadStatus.facilities = "Papa Parse 또는 Chart.js를 불러오지 못했습니다";
+    updateStatus();
+    return;
+  }
+
+  Papa.parse(facilitiesCsvPath, {
+    download: true,
+    header: true,
+    skipEmptyLines: "greedy",
+    complete: function (results) {
+      const fields = results.meta.fields || [];
+      if (results.errors.length > 0 || !fields.includes("구분")) {
+        loadStatus.facilities = "CSV 형식이나 ‘구분’ 열을 확인하세요";
+        updateStatus();
+        return;
+      }
+
+      const counts = Object.fromEntries(facilityLabels.map((label) => [label, 0]));
+      for (const row of results.data) {
+        const kind = (row["구분"] || "").trim();
+        if (!kind) continue;
+        const label = kind === "사찰" ? "불교" : facilityLabels.includes(kind) ? kind : "기타";
+        counts[label] += 1;
+      }
+
+      const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+      if (total === 0) {
+        loadStatus.facilities = "집계할 시설 데이터가 없습니다";
+        updateStatus();
+        return;
+      }
+
+      drawFacilitiesChart(counts);
+      loadStatus.facilities = "총 " + total + "곳 · 성당 " + counts["성당"]
+        + "곳, 교회 " + counts["교회"] + "곳, 불교 " + counts["불교"]
+        + "곳, 기타 " + counts["기타"] + "곳";
+      updateStatus();
+    },
+    error: function () {
+      loadStatus.facilities = "CSV 경로와 네트워크를 확인하세요";
+      updateStatus();
     }
   });
 }
@@ -163,4 +226,5 @@ for (const button of buttons) {
   });
 }
 
-loadCsv();
+loadSportsCsv();
+loadFacilitiesCsv();
