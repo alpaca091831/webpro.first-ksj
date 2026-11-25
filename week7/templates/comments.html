@@ -14,7 +14,7 @@
       <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
       <label for="content">{{ current_user['username'] }}님이 추천하는 운동 · 1~300자</label>
       <textarea id="content" name="content" rows="3" maxlength="300" required></textarea>
-      <button class="primary" type="submit">운동 올리기</button>
+      <button class="primary" type="submit">추천 올리기</button>
     </form>
   {% else %}
     <p>글을 쓰려면 실습용 계정으로 로그인하세요. 목록은 로그인하지 않아도 볼 수 있습니다.</p>
